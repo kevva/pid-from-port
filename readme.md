@@ -1,4 +1,4 @@
-# get-pid [![Build Status](https://travis-ci.org/kevva/get-pid.svg?branch=master)](https://travis-ci.org/kevva/get-pid)
+# pid-from-port [![Build Status](https://travis-ci.org/kevva/pid-from-port.svg?branch=master)](https://travis-ci.org/kevva/pid-from-port)
 
 > Get PID from a port
 
@@ -6,18 +6,18 @@
 ## Install
 
 ```
-$ npm install get-pid
+$ npm install pid-from-port
 ```
 
 
 ## Usage
 
 ```js
-const getPid = require('get-pid');
+const pidFromPort = require('pid-from-port');
 
 (async () => {
 	try {
-		console.log(await getPid(8080));
+		console.log(await pidFromPort(8080));
 		//=> 1337
 	} catch (err) {
 		console.log(err);
@@ -29,7 +29,7 @@ const getPid = require('get-pid');
 
 ## API
 
-### getPid(port)
+### pidFromPort(port)
 
 #### port
 

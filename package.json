@@ -1,9 +1,9 @@
 {
-	"name": "get-pid",
+	"name": "pid-from-port",
 	"version": "1.0.0",
 	"description": "Get PID from a port",
 	"license": "MIT",
-	"repository": "kevva/get-pid",
+	"repository": "kevva/pid-from-port",
 	"author": {
 		"name": "Kevin Martensson",
 		"email": "kevinmartensson@gmail.com",
