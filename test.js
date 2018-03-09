@@ -15,6 +15,9 @@ test('success', async t => {
 });
 
 test('fail', async t => {
-	const err = await t.throws(m(0));
-	t.is(err.message, 'Couldn\'t find a process with port `0`');
+	await t.throws(m(0), 'Couldn\'t find a process with port `0`');
+});
+
+test('accepts a number', async t => {
+	await t.throws(m('foo'), 'Expected a number, got string');
 });

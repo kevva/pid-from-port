@@ -15,7 +15,7 @@ const isProtocol = x => {
 
 module.exports = input => {
 	if (typeof input !== 'number') {
-		throw new TypeError(`Expected a number, got ${typeof input}`);
+		return Promise.reject(new TypeError(`Expected a number, got ${typeof input}`));
 	}
 
 	const fn = process.platform === 'darwin' ? macos : process.platform === 'linux' ? linux : win32;
