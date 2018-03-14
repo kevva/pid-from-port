@@ -1,5 +1,5 @@
 import http from 'http';
-import test from 'ava';
+import {serial as test} from 'ava';
 import getPort from 'get-port';
 import m from '.';
 
