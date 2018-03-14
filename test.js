@@ -37,3 +37,9 @@ test('all', async t => {
 	s1.close();
 	s2.close();
 });
+
+test('list', async t => {
+	const list = await m.list();
+	t.true(list instanceof Map);
+	await t.notThrows(m.all(Array.from(list.keys())));
+});

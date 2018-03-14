@@ -50,3 +50,18 @@ module.exports.all = input => {
 		.then(list => Promise.all(input.map(x => [x, getPort(x, list)])))
 		.then(list => new Map(list));
 };
+
+module.exports.list = () => getList().then(list => {
+	const cols = process.platform === 'darwin' ? [3, 8] : process.platform === 'linux' ? [3, 6] : [1, 4];
+	const ret = new Map();
+
+	for (const x of list) {
+		const match = x[cols[0]].match(/[^]*\.(\d+)$/);
+
+		if (match) {
+			ret.set(parseInt(match[1], 10), parseInt(x[cols[1]], 10));
+		}
+	}
+
+	return ret;
+});

@@ -55,6 +55,12 @@ Type: `Array<number>`
 
 Ports to lookup.
 
+### pidFromPort.list()
+
+Get all PIDs from ports.
+
+Returns a `Promise<Map>` with the port as key and the PID as value.
+
 
 ## License
 
