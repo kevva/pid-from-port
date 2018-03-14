@@ -56,7 +56,7 @@ module.exports.list = () => getList().then(list => {
 	const ret = new Map();
 
 	for (const x of list) {
-		const match = x[cols[0]].match(/[^]*\.(\d+)$/);
+		const match = x[cols[0]].match(/[^]*\.(\d+)$/) || x[cols[0]].match(/[^]*:(\d+)$/);
 
 		if (match) {
 			ret.set(parseInt(match[1], 10), parseInt(x[cols[1]], 10));
