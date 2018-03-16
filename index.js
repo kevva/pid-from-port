@@ -8,14 +8,13 @@ const macos = () => execa.stdout('netstat', ['-anv', '-p', 'tcp'])
 const linux = () => execa.stdout('netstat', ['-tunlp']);
 const win32 = () => execa.stdout('netstat', ['-ano']);
 
-const isProtocol = x => {
-	x = x.toLowerCase();
-	return x.startsWith('tcp') || x.startsWith('udp');
-};
+const getListFn = process.platform === 'darwin' ? macos : process.platform === 'linux' ? linux : win32;
+const cols = process.platform === 'darwin' ? [3, 8] : process.platform === 'linux' ? [3, 6] : [1, 4];
+const isProtocol = x => /^(tcp|udp)/i.test(x);
 
 const getPort = (input, list) => {
-	const cols = process.platform === 'darwin' ? [3, 8] : process.platform === 'linux' ? [3, 6] : [1, 4];
-	const port = list.find(x => x[cols[0]].endsWith(`:${input}`) || x[cols[0]].endsWith(`.${input}`));
+	const regex = new RegExp(`[.:]${input}$`);
+	const port = list.find(x => regex.test(x[cols[0]]));
 
 	if (!port) {
 		throw new Error(`Couldn't find a process with port \`${input}\``);
@@ -24,14 +23,16 @@ const getPort = (input, list) => {
 	return parseInt(port[cols[1]], 10);
 };
 
-const getList = () => {
-	const fn = process.platform === 'darwin' ? macos : process.platform === 'linux' ? linux : win32;
+const getList = () => getListFn().then(list => list
+	.split('\n')
+	.reduce((result, x) => {
+		if (isProtocol(x)) {
+			result.push(x.match(/\S+/g) || []);
+		}
 
-	return fn()
-		.then(list => list.split('\n'))
-		.then(list => list.filter(x => isProtocol(x)))
-		.then(list => list.map(x => x.match(/\S+/g) || []));
-};
+		return result;
+	}, [])
+);
 
 module.exports = input => {
 	if (typeof input !== 'number') {
@@ -52,11 +53,10 @@ module.exports.all = input => {
 };
 
 module.exports.list = () => getList().then(list => {
-	const cols = process.platform === 'darwin' ? [3, 8] : process.platform === 'linux' ? [3, 6] : [1, 4];
 	const ret = new Map();
 
 	for (const x of list) {
-		const match = x[cols[0]].match(/[^]*\.(\d+)$/) || x[cols[0]].match(/[^]*:(\d+)$/);
+		const match = x[cols[0]].match(/[^]*[.:](\d+)$/);
 
 		if (match) {
 			ret.set(parseInt(match[1], 10), parseInt(x[cols[1]], 10));
