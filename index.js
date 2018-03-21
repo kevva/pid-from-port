@@ -5,12 +5,21 @@ const macos = () => execa.stdout('netstat', ['-anv', '-p', 'tcp'])
 	.then(data => Promise.all([data, execa.stdout('netstat', ['-anv', '-p', 'udp'])]))
 	.then(data => data.join('\n'));
 
-const linux = () => execa.stdout('netstat', ['-tunlp']);
+const linux = () => execa.stdout('ss', ['-tunlp']);
 const win32 = () => execa.stdout('netstat', ['-ano']);
 
 const getListFn = process.platform === 'darwin' ? macos : process.platform === 'linux' ? linux : win32;
-const cols = process.platform === 'darwin' ? [3, 8] : process.platform === 'linux' ? [3, 6] : [1, 4];
-const isProtocol = x => /^(tcp|udp)/i.test(x);
+const cols = process.platform === 'darwin' ? [3, 8] : process.platform === 'linux' ? [4, 6] : [1, 4];
+const isProtocol = x => /^\s*(tcp|udp)/i.test(x);
+
+const parsePid = input => {
+	if (typeof input !== 'string') {
+		return null;
+	}
+
+	const match = input.match(/(?:^|",|",pid=)(\d+)/);
+	return match ? parseInt(match[1], 10) : null;
+};
 
 const getPort = (input, list) => {
 	const regex = new RegExp(`[.:]${input}$`);
@@ -20,7 +29,7 @@ const getPort = (input, list) => {
 		throw new Error(`Couldn't find a process with port \`${input}\``);
 	}
 
-	return parseInt(port[cols[1]], 10);
+	return parsePid(port[cols[1]]);
 };
 
 const getList = () => getListFn().then(list => list
@@ -59,7 +68,7 @@ module.exports.list = () => getList().then(list => {
 		const match = x[cols[0]].match(/[^]*[.:](\d+)$/);
 
 		if (match) {
-			ret.set(parseInt(match[1], 10), parseInt(x[cols[1]], 10));
+			ret.set(parseInt(match[1], 10), parsePid(x[cols[1]]));
 		}
 	}
 
